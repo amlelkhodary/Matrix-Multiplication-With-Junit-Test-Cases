@@ -1,4 +1,8 @@
 package org.example;
+
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
 public class Main {
     public static void main(String[] args) {
         Matrix A = new Matrix(2,3);
@@ -32,11 +36,45 @@ public class Main {
 //        B.setColumnsNo(2);
 //        B.setMatrix(new int[][]{{1,2}});
 //        C = A.multiply(B); // expected to see IllegalArgumentException
-
-
+//
+//
 //        Matrix one =  new Matrix(2,2);
 //        Matrix two = new Matrix(2,1);
 //        Matrix three = one.multiply(two);
 //        three.print(); // Expected to see zeros
+
+        Matrix matrixThread1_1 = new Matrix(4,2, new int[][]{{1,2},{3,4},{5,6},{7,8}});
+        Matrix matrixThread1_2 = new Matrix(2,3, new int[][]{{1,2,3},{4,5,6}});
+        Matrix matrixThread1 = matrixThread1_1.multiply(matrixThread1_2);
+        matrixThread1.print();
+        System.out.println("************************************");
+
+
+        Matrix matrixThread2_1 = new Matrix(2,3, new int[][]{{1,2,3},{4,5,6}});
+        Matrix matrixThread2_2 = new Matrix(3,2, new int[][]{{1,2},{2,3},{3,4}});
+        Matrix matrixThread2 = matrixThread2_1.multiply(matrixThread2_2);
+        matrixThread2.print();
+        System.out.println("------------------------------------");
+
+
+//        ExecutorService threads = Executors.newFixedThreadPool(2);
+//        threads.submit(() -> {
+//            Matrix matrixThread1_1 = new Matrix(4,2, new int[][]{{1,2},{3,4},{5,6},{7,8}});
+//            Matrix matrixThread1_2 = new Matrix(2,3, new int[][]{{1,2,3},{4,5,6}});
+//            Matrix matrixThread1 = matrixThread1_1.multiply(matrixThread1_2);
+//            matrixThread1.print();
+//            System.out.println("************************************");
+//        });
+//
+//        threads.submit(() -> {
+//            Matrix matrixThread2_1 = new Matrix(2,3, new int[][]{{1,2,3},{4,5,6}});
+//            Matrix matrixThread2_2 = new Matrix(3,2, new int[][]{{1,2},{2,3},{3,4}});
+//            Matrix matrixThread2 = matrixThread2_1.multiply(matrixThread2_2);
+//            matrixThread2.print();
+//            System.out.println("------------------------------------");
+//        });
+
+
+//        threads.shutdown();
     }
 }

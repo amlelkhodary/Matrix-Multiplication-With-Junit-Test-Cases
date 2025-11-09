@@ -3,17 +3,22 @@ package org.example;
 import java.util.Arrays;
 
 public class Matrix {
-    private int rowsNo;
-    private int columnsNo;
-    private int[][] matrix;
+    protected int rowsNo;
+    protected int columnsNo;
+    protected int[][] matrix;
 
     Matrix(){
-
+//        matrix = new int[rowsNo][columnsNo];
     }
     Matrix(int rowsNo, int columnsNo){
         this.rowsNo = rowsNo;
         this.columnsNo = columnsNo;
         matrix = new int[rowsNo][columnsNo];
+    }
+    Matrix(int rowsNo, int columnsNo, int[][] matrix){
+        this.rowsNo = rowsNo;
+        this.columnsNo = columnsNo;
+        this.matrix = matrix;
     }
     public void setRowsNo(int rowsNo){
         this.rowsNo = rowsNo;
@@ -33,17 +38,8 @@ public class Matrix {
     public int[][] getMatrix(){
         return matrix;
     }
-    public void print(){
-        for(int i=0; i < rowsNo; i++){
-            for(int j=0; j < columnsNo; j++){
-                System.out.print(matrix[i][j] +" ");
-            }
-            System.out.print("\n");
-        }
-    }
 
     public Matrix multiply(Matrix matrixB){
-        System.out.println(this);
         if(this.getColumnsNo() != matrixB.getRowsNo())
             throw new IllegalArgumentException("Columns No in matrix A must equal Rows No in matrix B");
         if((matrix == null) || (matrixB.getMatrix() == null))
@@ -66,30 +62,16 @@ public class Matrix {
         }
         matrixC.setMatrix(C);
 
-    return matrixC;
+        return matrixC;
+    }
+
+    public synchronized void print(){
+        for(int i=0; i < rowsNo; i++){
+            for(int j=0; j < columnsNo; j++){
+                System.out.print(matrix[i][j] +" ");
+            }
+            System.out.print("\n");
+        }
     }
 }
 
-
-//public void multiplyMatrices(Matrix matrixA, Matrix matrixB){
-//    if(matrixA.getColumnsNo() != matrixB.getRowsNo())
-//        throw new IllegalArgumentException("Columns No in matrix A must equal Rows No in matrix B");
-//    else{
-//        rowsNo = matrixA.getRowsNo();
-//        columnsNo = matrixB.getColumnsNo();
-//        matrix = new int[rowsNo][columnsNo];
-//        int[][] A= matrixA.getMatrix();
-//        int[][] B= matrixB.getMatrix();
-//        int matrixElement;
-//        for(int i=0; i < matrixA.getRowsNo(); i++){
-//            for(int k=0; k<matrixB.getColumnsNo(); k++){
-//                matrixElement = 0;
-//                for(int j=0; j < matrixB.getRowsNo(); j++){
-//                    matrixElement += A[i][j] * B[j][k];
-//                }
-//                matrix[i][k] = matrixElement;
-//            }
-//        }
-//    }
-////        return this;
-//}
