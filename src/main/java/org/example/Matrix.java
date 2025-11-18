@@ -1,6 +1,10 @@
 package org.example;
 
 import java.util.Arrays;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.ReentrantLock;
 
 public class Matrix {
     protected int rowsNo;
@@ -48,30 +52,48 @@ public class Matrix {
         Matrix matrixC = new Matrix(this.getRowsNo(), matrixB.getColumnsNo());
         int[][] A = this.getMatrix();
         int[][] B = matrixB.getMatrix();
-        // int[][] C = new int[this.getRowsNo()][matrixB.getColumnsNo()];
         int[][] C = new int[matrixC.rowsNo][matrixC.columnsNo];
-        int matrixElement;
-        for(int i=0; i < this.getRowsNo(); i++){
-            for(int k=0; k<matrixB.getColumnsNo(); k++){
-                matrixElement = 0;
-                for(int j=0; j < matrixB.getRowsNo(); j++){
-                    matrixElement += A[i][j] * B[j][k];
-                }
-                C[i][k] = matrixElement;
-            }
-        }
-        matrixC.setMatrix(C);
 
+        ExecutorService rowsThreads = Executors.newFixedThreadPool(matrixC.rowsNo);
+        for(int i=0; i < this.getRowsNo(); i++){
+            final int i_final = i;
+            rowsThreads.submit(()->{
+                for(int k = 0; k < matrixB.getColumnsNo(); k++){
+                    int matrixElement = 0;
+                    for(int j=0; j < matrixB.getRowsNo(); j++){
+                        matrixElement += A[i_final][j] * B[j][k];
+                    }
+                    C[i_final][k] = matrixElement;
+                }
+            });
+        }
+        rowsThreads.shutdown();
+        try {
+            rowsThreads.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
+        }
+        catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        matrixC.setMatrix(C);
         return matrixC;
     }
 
-    public synchronized void print(){
-        for(int i=0; i < rowsNo; i++){
-            for(int j=0; j < columnsNo; j++){
-                System.out.print(matrix[i][j] +" ");
+    public void print(){
+        ReentrantLock mutex = new ReentrantLock();
+        try{
+            mutex.lock();
+            for(int i=0; i < rowsNo; i++){
+                for(int j=0; j < columnsNo; j++){
+                    System.out.print(matrix[i][j] +" ");
+                }
+                System.out.print("\n");
             }
-            System.out.print("\n");
         }
+        finally{
+            mutex.unlock();
+        }
+
     }
 }
 
