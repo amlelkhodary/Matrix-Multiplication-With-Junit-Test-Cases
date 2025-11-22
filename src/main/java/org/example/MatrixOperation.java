@@ -38,6 +38,7 @@ public class MatrixOperation {
             }
 
         }
+        matrixThreads.joinThreads();
         matrixC.setMatrix(C);
         return matrixC;
     }

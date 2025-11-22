@@ -14,15 +14,21 @@ public class MatrixThreads {
             locks[threadNo].lock();
             threads[threadNo] = thread;
             threads[threadNo].start();
-            try{
-                threads[threadNo].join();
-            }
-            catch (InterruptedException e){
-                e.printStackTrace();
-            }
         }
         finally{
             locks[threadNo].unlock();
+        }
+    }
+    public void joinThreads(){
+        for(int i=0; i<10; i++){
+            if(threads[i] != null){
+                try{
+                    threads[i].join();
+                }
+                catch(InterruptedException e){
+                    e.printStackTrace();
+                }
+            }
         }
     }
 }
