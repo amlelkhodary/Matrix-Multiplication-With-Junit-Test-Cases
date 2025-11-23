@@ -1,49 +1,68 @@
 package org.example;
 
-import java.util.concurrent.BlockingQueue;
+import java.util.LinkedList;
+import java.util.Queue;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 public class FixedThreads {
-    private int threadsNo;
     private Thread[] threads;
-    private Lock[] locks;
+    private Queue<Runnable> queue = new LinkedList<>();
+    private volatile boolean running = true;
 
-    FixedThreads(int threadsNo){
-        this.threadsNo = threadsNo;
+    public FixedThreads(int threadsNo) {
         threads = new Thread[threadsNo];
-        locks = new ReentrantLock[threadsNo];
+
+        for (int i = 0; i < threadsNo; i++) {
+            threads[i] = new Thread(() -> {
+                while (running || !queue.isEmpty()) {
+                    Runnable task;
+
+                    synchronized (queue) {
+                        while (queue.isEmpty() && running) {
+                            try {
+                                queue.wait();
+                            } catch (InterruptedException ignored) {}
+                        }
+
+                        if (!running && queue.isEmpty())
+                            return;
+
+                        task = queue.poll();
+                    }
+
+                    task.run();
+                }
+            });
+
+            threads[i].start();
+        }
     }
 
-    public void addTask(int threadIndex, Runnable task){
-        try{
-            locks[threadIndex] = new ReentrantLock();
-            locks[threadIndex].lock();
-            threads[threadIndex] = new Thread(task);
-            threads[threadIndex].start();
+    public void addTask(Runnable task){
+        synchronized (queue){
+            queue.add(task);
+            queue.notify();
         }
-        finally{
-            locks[threadIndex].unlock();
+    }
+
+    public void shutdown() {
+        synchronized (queue) {
+            running = false;
+            queue.notifyAll();
         }
     }
 
     public void joinThreads(){
-        for(int i=0; i<threadsNo; i++){
-            if(threads[i] != null){
+        for(Thread thread : threads){
+            if(thread != null){
                 try{
-                    threads[i].join();
+                    thread.join();
                 }
                 catch(InterruptedException e){
                     e.printStackTrace();
                 }
             }
         }
-    }
-
-    public void setThreadNo(int threadNo){
-        this.threadsNo = threadNo;
-    }
-    public int getThreadNo(){
-        return threadsNo;
     }
 }

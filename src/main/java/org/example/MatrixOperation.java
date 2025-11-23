@@ -21,15 +21,19 @@ public class MatrixOperation {
 
         Matrix matrixC = new Matrix();
         int[][] C = new int[matrixA.getMatrix().length][matrixB.getMatrix()[0].length];
+        CountDownLatch latch = new CountDownLatch(matrixA.getMatrix().length * matrixB.getMatrix()[0].length);
 
         for(int i=0; i < matrixA.getMatrix().length; i++){
             for(int k = 0; k < matrixB.getMatrix()[0].length; k++) {
-                MultiplyTask runnable = new MultiplyTask(matrixA, matrixB, i, k, C);
-                threads.addTask(i % threads.getThreadNo(), runnable);
+                MultiplyTask runnable = new MultiplyTask(matrixA, matrixB, i, k, C, latch);
+                threads.addTask(runnable);
             }
         }
-
-        threads.joinThreads();
+        try{
+            latch.await();
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
         matrixC.setMatrix(C);
         return matrixC;
     }
