@@ -2,22 +2,29 @@ package org.example;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 public class Main {
     public static void main(String[] args) {
+        FixedThreads fixedThreads = new FixedThreads(10);
         Matrix A = new Matrix();
         Matrix B = new Matrix();
         A.setMatrix(new int[][] {{1,2,3},{4,5,6}});
         B.setMatrix(new int[][]{{1},{2},{3}});
-        MatrixOperation operation = new MatrixOperation(A,B);
-        operation.multiply().print();
+        MatrixOperation operation = new MatrixOperation(A, B, fixedThreads);
+        Matrix C = operation.multiply();
+        fixedThreads.joinThreads();
+        C.print();
         System.out.println("************************************");
 
         A.setMatrix(new int[][] {{1,2,3,4,5},{6,7,8,9,10},{11,12,13,14,15},{16,17,18,19,20}});
         B.setMatrix(new int[][] {{1,2,3},{4,5,6},{7,8,9},{10,11,12},{13,14,15}});
-        operation.multiply().print();
-
+        C = operation.multiply();
+        fixedThreads.joinThreads();
+        C.print();
         System.out.println("************************************");
+
         A.setMatrix(new int[][]{
                 {1,2,3,4,5},
                 {6,7,8,9,10},
@@ -48,13 +55,12 @@ public class Main {
                 {46,47,48,49,50,51,52,53,54,55,56,57,58,59,60},
                 {61,62,63,64,65,66,67,68,69,70,71,72,73,74,75}
         });
-        operation.multiply().print();
 
+        C = operation.multiply();
+        fixedThreads.joinThreads();
+        C.print();
         System.out.println("************************************");
 
-        Matrix matrixA = new Matrix(new int[][] {{1,2,3,4,5},{6,7,8,9,10},{11,12,13,14,15},{16,17,18,19,20}});
-        Matrix matrixB = new Matrix(new int[][] {{1,2,3},{4,5,6},{7,8,9},{10,11,12},{13,14,15}});
-        MatrixOperation operation2 = new MatrixOperation(matrixA, matrixB);
-        operation2.multiply().print();
+        fixedThreads.joinThreads();
     }
 }
